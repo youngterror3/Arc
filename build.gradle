@@ -1,0 +1,85 @@
+ext{
+    versions = [:]
+    libraries = [:]
+}
+
+versions.robovm = "2.3.11"
+versions.junit = "4.11"
+versions.androidPlugin = "3.4.1"
+versions.androidSdk = 29
+versions.androidBuildTools = "29.0.3"
+versions.teavm = '0.7.0-dev-1087'
+versions.reflections = '0.9.11'
+versions.jnigen = "dffc32eecbf77aad264991ea44f1767a58cbee9d"
+
+libraries.robovm = [
+    "com.mobidevelop.robovm:robovm-rt:${versions.robovm}",
+    "com.mobidevelop.robovm:robovm-objc:${versions.robovm}",
+    "com.mobidevelop.robovm:robovm-cocoatouch:${versions.robovm}"
+]
+
+libraries.junit = [
+    "junit:junit:${versions.junit}"
+]
+
+libraries.teavm = [
+     "org.teavm:teavm-core:$versions.teavm",
+     "org.teavm:teavm-classlib:$versions.teavm",
+     "org.teavm:teavm-jso:$versions.teavm",
+     "org.teavm:teavm-jso-apis:$versions.teavm",
+     "org.teavm:teavm-jso-impl:$versions.teavm",
+     "org.reflections:reflections:$versions.reflections"
+]
+
+libraries.jnigen = [
+    "com.github.libgdx.gdx-jnigen:gdx-jnigen:$versions.jnigen"
+]
+
+allprojects{
+    group = 'com.github.Anuken'
+    version = '1.0'
+
+    buildscript{
+        repositories{
+            mavenCentral()
+            maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+            google()
+            maven{ url 'https://jitpack.io' }
+        }
+
+        dependencies{
+            classpath "com.github.libgdx.gdx-jnigen:gdx-jnigen-gradle:dffc32eecbf77aad264991ea44f1767a58cbee9d"
+        }
+    }
+
+    repositories{
+        mavenCentral()
+        maven{ url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        maven{ url "https://dl.bintray.com/konsoletyper/teavm" }
+        google()
+        maven{ url 'https://jitpack.io' }
+    }
+
+    ext.aproj = { String module ->
+        if(findProject(module) != null){
+            return project(module)
+        }else{
+            return project(":Arc" + module)
+        }
+    }
+
+    tasks.withType(JavaCompile){
+        sourceCompatibility = 1.8
+        targetCompatibility = 1.8
+        options.encoding = "UTF-8"
+    }
+}
+
+subprojects{
+    apply plugin: "java-library"
+
+    compileJava{
+        options.fork = true
+        options.incremental = true
+    }
+}
